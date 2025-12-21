@@ -1,17 +1,11 @@
 # recipe-storage
 
-Python app designed to locally manage various recipes
+Python app designed to locally manage various recipes. Built with FastAPI and SQLAlchemy
 
-Run with `make run`
+## Development
 
-Get all recipes with `curl -X GET "http://127.0.0.1:8000/recipes"`
+### Running DB
 
-Add recipe with:
-```bash
-curl -X GET "http://127.0.0.1:8000/recipes" \
--H "Content-Type: application/json" \
--d @tmp/recipe1.json
-```
+In root directory, run `make run`. Alternatively if don't have make installed, can run `uvicorn app.main:app --reload`
 
-TODO:
-- recipe1.json errors, but recipe2.json does not error
+Naviage to URL `127.0.0.1:8000/docs` to test available endpoints

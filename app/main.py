@@ -1,88 +1,117 @@
-import uvicorn
-
-from contextlib import asynccontextmanager
+from fastapi import FastAPI, HTTPException, Depends
+from sqlalchemy.orm import Session
 from typing import List
-from fastapi import FastAPI, HTTPException
-from sqlmodel import select
 
-from app.sql_utils import Recipe, SessionDep, create_db_and_tables, Instruction, Ingredient, Tag, Note, Image
-
-
-@asynccontextmanager
-async def lifespan(app: FastAPI):
-    create_db_and_tables()
-    yield
+from app.db import get_session, RecipeResponse, Recipe, RecipeCreate, Tag
 
 
 app = FastAPI(
     title="Recipe Storage",
-    description="An API for self-hosting recipes with search functionality.",
-    lifespan=lifespan
+    description="A recipes API with search functionality, using fastapi and sqlalchemy.",
 )
 
 
-# Get all recipes
-# TODO: Would like to enhance this to allow searching recipes
-@app.get("/recipes", response_model=List[Recipe])
-async def get_recipes(session: SessionDep, skip: int = 0, limit: int = 10):
-    recipes = session.exec(select(Recipe).offset(skip).limit(limit)).all()
-    return recipes
+@app.get("/")
+def root():
+    return {"message": "Recipe Storage API Running"}
 
 
-# Create new recipe
-@app.post("/recipes", response_model=Recipe)
-async def create_recipe(session: SessionDep, recipe: Recipe):
-    # Preprocess recipe data
-    recipe.instructions = [
-        Instruction(step=instruction) for instruction in getattr(recipe, "instructions", [])
-    ]
-    recipe.ingredients = [
-        Ingredient(name=ingredient.get("name"), amount=ingredient.get("amount"))
-        for ingredient in getattr(recipe, "ingredients", [])
-    ]
-    recipe.tags = [Tag(name=tag) for tag in getattr(recipe, "tags", [])]
-    recipe.notes = [Note(item=note) for note in getattr(recipe, "notes", [])]
-    recipe.images = [Image(filename=image) for image in getattr(recipe, "images", [])]
+# Read all recipes
+@app.get("/recipes", response_model=List[RecipeResponse])
+def get_recipes(session: Session = Depends(get_session)):
+    # Query all recipes
+    recipes = session.query(Recipe).all()
+
+    return [RecipeResponse.model_validate_response(recipe) for recipe in recipes]
 
 
-
-    session.add(recipe)
-    session.commit()
-    session.refresh(recipe)
-    return recipe
-
-
-@app.get("/recipes/{recipe_id}", response_model=Recipe)
-async def get_recipe_by_id(session: SessionDep, recipe_id: int):
-    recipe = session.get(Recipe, recipe_id)
-    if not recipe:
-        raise HTTPException(status_code=404, detail=f"Recipe not found with given id: {recipe_id}")
-    return recipe
-
-
-@app.put("/recipes/{recipe_id}", response_model=Recipe)
-async def update_recipe(session: SessionDep, recipe_id: int, recipe_data: Recipe):
-    recipe = session.get(Recipe, recipe_id)
-    if not recipe:
-        raise HTTPException(status_code=404, detail=f"Recipe not found with given id: {recipe_id}")
+# Create recipe
+@app.post("/recipes", response_model=RecipeResponse)
+def create_recipe(recipe: RecipeCreate, session: Session = Depends(get_session)):
+    if session.query(Recipe).filter(Recipe.name == recipe.name).first():
+        raise HTTPException(status_code=404, detail="Recipe already exists!")
     
-    for field, value in recipe_data.model_dump().items():
-        setattr(recipe, field, value)
+    # Create new recipe
+    new_recipe = Recipe(name=recipe.name, description=recipe.description)
+    session.add(new_recipe)
+
+    # Process tags
+    for tag_name in recipe.tags:
+        tag_name = tag_name.lower()
+        tag = session.query(Tag).filter(Tag.name == tag_name).first()
+        if not tag:
+            # Create a new tag if it doesn't exist
+            tag = Tag(name=tag_name)
+            session.add(tag)
+            session.commit()
+            session.refresh(tag)
+        # Associate the tag with the recipe
+        new_recipe.tags.append(tag)
 
     session.commit()
-    session.refresh(recipe)
-    return recipe
+    session.refresh(new_recipe)
+
+    return RecipeResponse.model_validate_response(new_recipe)
 
 
-@app.delete("/recipes/{recipe_id}", response_model=Recipe)
-async def delete_recipe(session: SessionDep, recipe_id: int):
-    recipe = session.get(Recipe, recipe_id)
+# Read recipe by ID
+@app.get("/recipes/{recipe_id}", response_model=RecipeResponse)
+def get_recipe_by_id(recipe_id: int, session: Session = Depends(get_session)):
+    recipe = session.query(Recipe).filter(Recipe.id == recipe_id).first()
     if not recipe:
-        raise HTTPException(status_code=404, detail=f"Recipe not found with given id: {recipe_id}")
+        raise HTTPException(status_code=404, detail="Recipe not found!")
     
-    session.delete(recipe)
-    session.commit()
-    return recipe
+    return RecipeResponse.model_validate_response(recipe)
 
-if __name__ == "__main__":
-    uvicorn.run(app, host="127.0.0.1", port=8000)
+
+
+# Update recipe by ID
+@app.put("/recipes/{recipe_id}", response_model=RecipeResponse)
+def update_recipe(recipe_id: int, recipe: RecipeCreate, session: Session = Depends(get_session)):
+    db_recipe = session.query(Recipe).filter(Recipe.id == recipe_id).first()
+    if not db_recipe:
+        raise HTTPException(status_code=404, detail="Recipe does not exist!")
+
+    # Update recipe fields
+    db_recipe.name = recipe.name
+    db_recipe.description = recipe.description
+
+    # Update tags
+    db_recipe.tags.clear()  # Remove existing tags
+    for tag_name in recipe.tags:
+        tag_name = tag_name.lower()
+        tag = session.query(Tag).filter(Tag.name == tag_name).first()
+        if not tag:
+            # Create a new tag if it doesn't exist
+            tag = Tag(name=tag_name)
+            session.add(tag)
+            session.commit()
+            session.refresh(tag)
+        # Associate the tag with the recipe
+        db_recipe.tags.append(tag)
+
+    session.commit()
+    session.refresh(db_recipe)
+
+    return RecipeResponse.model_validate_response(db_recipe)
+
+
+# Delete recipe by ID
+@app.delete("/recipes/{recipe_id}")
+def delete_recipe(recipe_id: int, session: Session = Depends(get_session)):
+    db_recipe = session.query(Recipe).filter(Recipe.id == recipe_id).first()
+    if not db_recipe:
+        raise HTTPException(status_code=404, detail="Recipe does not exist!")
+
+    session.delete(db_recipe)
+    session.commit()
+    return {"message": "Recipe deleted!"}
+
+
+# Read recipes by tag
+@app.get("/recipes/search/{tag_name}", response_model=List[RecipeResponse])
+def search_recipes_by_tag(tag_name: str, session: Session = Depends(get_session)):
+    # Query recipes that have the given tag
+    recipes = session.query(Recipe).join(Recipe.tags).filter(Tag.name == tag_name).all()
+
+    return [RecipeResponse.model_validate_response(recipe) for recipe in recipes]
