@@ -4,6 +4,42 @@ Python app designed to locally manage various recipes. Built with FastAPI and SQ
 
 ## Development
 
+### Project Structure
+
+The project structure is as follows:
+
+```
+recipe-storage
+├── .gitignore
+├── LICENSE
+├── makefile
+├── README.md
+├── requirements.txt
+├── app
+│   ├── __init__.py
+│   ├── dependencies.py
+│   ├── main.py
+│   ├── core
+│   │   ├── __init__.py
+│   │   ├── config.py
+│   ├── db
+│   │   ├── __init__.py
+│   │   ├── database.py
+│   ├── models
+│   │   ├── __init__.py
+│   │   ├── recipes.py
+│   ├── routers
+│   │   ├── __init__.py
+│   │   ├── recipes.py
+│   ├── schemas
+│   │   ├── __init__.py
+│   │   ├── recipes.py
+│   ├── services
+│       ├── __init__.py
+│       ├── receipes_service.py
+├── tests
+```
+
 ### Running DB
 
 In root directory, run `make run`. Alternatively if don't have make installed, can run `uvicorn app.main:app --reload`
