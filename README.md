@@ -15,6 +15,7 @@ recipe-storage
 ├── makefile
 ├── README.md
 ├── requirements.txt
+├── dev-requirements.txt
 ├── app
 │   ├── __init__.py
 │   ├── dependencies.py
@@ -38,6 +39,7 @@ recipe-storage
 │       ├── __init__.py
 │       ├── receipes_service.py
 ├── tests
+│   ├── test-main.py
 ```
 
 ### Running DB
