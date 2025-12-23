@@ -1,4 +1,3 @@
-
 from fastapi import APIRouter, HTTPException, Depends
 from sqlalchemy.orm import Session
 from typing import List
@@ -10,8 +9,13 @@ from app.services.receipes_service import process_tags
 
 router = APIRouter(prefix="/recipes", tags=["recipes"])
 
+
 # Read all recipes
-@router.get("/", description="Get all recipes from database", response_model=List[RecipeResponse])
+@router.get(
+    "/",
+    description="Get all recipes from database",
+    response_model=List[RecipeResponse],
+)
 def get_recipes(session: Session = Depends(get_db)):
     # Query all recipes
     recipes = session.query(Recipe).all()
@@ -20,11 +24,15 @@ def get_recipes(session: Session = Depends(get_db)):
 
 
 # Create recipe
-@router.post("/", description="Create new recipe and add to database", response_model=RecipeResponse)
+@router.post(
+    "/",
+    description="Create new recipe and add to database",
+    response_model=RecipeResponse,
+)
 def create_recipe(recipe: RecipeCreate, session: Session = Depends(get_db)):
     if session.query(Recipe).filter(Recipe.name == recipe.name).first():
         raise HTTPException(status_code=404, detail="Recipe already exists!")
-    
+
     # Create new recipe
     new_recipe = Recipe(name=recipe.name, description=recipe.description)
     session.add(new_recipe)
@@ -45,14 +53,16 @@ def get_recipe_by_id(recipe_id: int, session: Session = Depends(get_db)):
     recipe = session.query(Recipe).filter(Recipe.id == recipe_id).first()
     if not recipe:
         raise HTTPException(status_code=404, detail="Recipe not found!")
-    
+
     return RecipeResponse.model_validate_response(recipe)
 
 
 # Update recipe by ID
 # TODO: add description
 @router.put("/{recipe_id}", response_model=RecipeResponse)
-def update_recipe(recipe_id: int, recipe: RecipeCreate, session: Session = Depends(get_db)):
+def update_recipe(
+    recipe_id: int, recipe: RecipeCreate, session: Session = Depends(get_db)
+):
     db_recipe = session.query(Recipe).filter(Recipe.id == recipe_id).first()
     if not db_recipe:
         raise HTTPException(status_code=404, detail="Recipe does not exist!")
@@ -85,7 +95,11 @@ def delete_recipe(recipe_id: int, session: Session = Depends(get_db)):
 
 
 # Read recipes by tag
-@router.get("/tags/{tag_name}", description="Search recipes by tag", response_model=List[RecipeResponse])
+@router.get(
+    "/tags/{tag_name}",
+    description="Search recipes by tag",
+    response_model=List[RecipeResponse],
+)
 def search_recipes_by_tag(tag_name: str, session: Session = Depends(get_db)):
     # Query recipes that have the given tag
     recipes = session.query(Recipe).join(Recipe.tags).filter(Tag.name == tag_name).all()

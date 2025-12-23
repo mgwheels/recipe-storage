@@ -26,5 +26,5 @@ class RecipeResponse(BaseModel):
             id=recipe.id,
             name=recipe.name,
             description=recipe.description,
-            tags=[tag.name for tag in recipe.tags]
+            tags=[tag.name for tag in recipe.tags],
         )
