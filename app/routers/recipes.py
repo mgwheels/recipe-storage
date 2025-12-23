@@ -5,7 +5,7 @@ from typing import List
 from app.dependencies import get_db
 from app.models.recipes import Recipe, Tag
 from app.schemas.recipes import RecipeCreate, RecipeResponse
-from app.services.receipes_service import process_tags
+from app.services.recipes_service import process_tags
 
 router = APIRouter(prefix="/recipes", tags=["recipes"])
 
