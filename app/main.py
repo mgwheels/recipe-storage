@@ -1,7 +1,9 @@
 from fastapi import FastAPI
 
 from app.routers.recipes import router as recipes_router
+from app.db.database import Base, Engine
 
+Base.metadata.create_all(Engine)
 
 app = FastAPI(
     title="Recipe Storage",
