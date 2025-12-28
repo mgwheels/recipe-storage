@@ -31,10 +31,12 @@ def get_recipes(session: Session = Depends(get_db)):
 )
 def create_recipe(recipe: RecipeCreate, session: Session = Depends(get_db)):
     if session.query(Recipe).filter(Recipe.name == recipe.name).first():
-        raise HTTPException(status_code=404, detail="Recipe already exists!")
+        raise HTTPException(status_code=409, detail="Recipe already exists!")
 
     # Create new recipe
-    new_recipe = Recipe(name=recipe.name, description=recipe.description)
+    new_recipe = Recipe(name=recipe.name)
+    if recipe.description: new_recipe.description = recipe.description
+    if recipe.notes: new_recipe.notes = recipe.notes
     session.add(new_recipe)
 
     # Process tags
@@ -68,8 +70,9 @@ def update_recipe(
         raise HTTPException(status_code=404, detail="Recipe does not exist!")
 
     # Update recipe fields
-    db_recipe.name = recipe.name
-    db_recipe.description = recipe.description
+    if recipe.name: db_recipe.name = recipe.name
+    if recipe.description: db_recipe.description = recipe.description
+    if recipe.notes: db_recipe.notes = recipe.notes
 
     # Update tags
     db_recipe.tags.clear()  # Remove existing tags

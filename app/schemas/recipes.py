@@ -7,6 +7,7 @@ from app.models.recipes import Recipe
 class RecipeCreate(BaseModel):
     name: str
     description: str
+    notes: str
     tags: list[str] = []  # Optional list of tag names
 
 
@@ -14,6 +15,7 @@ class RecipeResponse(BaseModel):
     id: int
     name: str
     description: str
+    notes: str
     tags: list[str]
 
     model_config = ConfigDict(from_attributes=True)
@@ -25,5 +27,6 @@ class RecipeResponse(BaseModel):
             id=recipe.id,
             name=recipe.name,
             description=recipe.description,
+            notes=recipe.notes,
             tags=[tag.name for tag in recipe.tags],
         )

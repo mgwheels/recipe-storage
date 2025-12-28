@@ -4,7 +4,7 @@ from sqlalchemy.orm import Mapped, relationship
 from app.db.database import Base
 
 
-# Junction table for many-to-many relationship
+# Junction tables for many-to-many relationship
 recipe_tags = Table(
     "recipe_tags",
     Base.metadata,
@@ -30,8 +30,9 @@ class Recipe(Base):
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String(100), nullable=False, unique=True)
     description = Column(String(100), nullable=False)
+    notes = Column(String(500), nullable=True)
 
-    # Many-to-many relationship with Tag
+    # Many-to-many relationships
     tags: Mapped[list["Tag"]] = relationship(
         "Tag", secondary=recipe_tags, back_populates="recipes"
     )
