@@ -2,6 +2,7 @@ help:
 	echo "\nAvailable make commands:\n\ndeps\nlint\nrun\ntest"
 
 deps:
+	python -m pip install --upgrade pip
 	pip install -r requirements.txt
 	pip install -r dev-requirements.txt
 
