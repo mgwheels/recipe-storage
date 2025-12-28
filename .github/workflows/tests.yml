@@ -1,16 +1,59 @@
-name: Python Tests via Makefile
+name: CI with Security Scan
 
-on: [push, pull_request]
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
 
 jobs:
   linting:
     runs-on: ubuntu-latest
     steps:
-      - uses: ./.github/actions/setup
-      - run: make lint
+      - name: Check out code # TODO: Split out shared checkout, setup, deps
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: make deps
+
+      - name: Run Lint
+        run: make lint
 
   unit-tests:
     runs-on: ubuntu-latest
     steps:
-      - uses: ./.github/actions/setup
-      - run: make test
+      - name: Check out code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: make deps
+
+      - name: Run Tests
+        run: make test
+
+  code-scan:
+    runs-on: ubuntu-latest
+    permissions:
+      security-events: write # Required to upload results to the Security tab
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: python
+
+      - name: Perform Analysis
+        uses: github/codeql-action/analyze@v3
