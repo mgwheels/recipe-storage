@@ -18,28 +18,20 @@ recipe-storage
 ├── dev-requirements.txt
 ├── app
 │   ├── __init__.py
-│   ├── dependencies.py
 │   ├── main.py
 │   ├── core
 │   │   ├── __init__.py
 │   │   ├── config.py
-│   ├── db
-│   │   ├── __init__.py
 │   │   ├── database.py
-│   ├── models
-│   │   ├── __init__.py
-│   │   ├── recipes.py
-│   ├── routers
-│   │   ├── __init__.py
-│   │   ├── recipes.py
-│   ├── schemas
-│   │   ├── __init__.py
-│   │   ├── recipes.py
-│   ├── services
-│       ├── __init__.py
-│       ├── receipes_service.py
+│   │   ├── models.py
+│   │   ├── routers.py
+│   │   ├── schemas.py
+│   │   ├── utils.py
 ├── tests
 │   ├── test-main.py
+│   ├── core
+│   │   ├── test_config.py
+│   │   ├── test_database.py
 ```
 
 ### Running DB

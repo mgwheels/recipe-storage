@@ -1,6 +1,6 @@
 from pydantic import BaseModel, ConfigDict
 
-from app.models.recipes import Recipe
+from app.core.models import Recipe
 
 
 # Pydantic Models (Dataclass)

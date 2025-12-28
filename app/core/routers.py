@@ -2,10 +2,10 @@ from fastapi import APIRouter, HTTPException, Depends
 from sqlalchemy.orm import Session
 from typing import List
 
-from app.db.database import get_db
-from app.models.recipes import Recipe, Tag
-from app.schemas.recipes import RecipeCreate, RecipeResponse
-from app.services.recipes_service import process_tags
+from app.core.database import get_db
+from app.core.models import Recipe, Tag
+from app.core.schemas import RecipeCreate, RecipeResponse
+from app.core.utils import process_tags
 
 router = APIRouter(prefix="/recipes", tags=["recipes"])
 

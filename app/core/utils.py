@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Session
 
-from app.models.recipes import Recipe, Tag
-from app.schemas.recipes import RecipeCreate
+from app.core.models import Recipe, Tag
+from app.core.schemas import RecipeCreate
 
 
 # TODO: Docstring

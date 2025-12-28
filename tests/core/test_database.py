@@ -1,9 +1,9 @@
 from unittest.mock import MagicMock, patch
 
-import app.db.database as database
+import app.core.database as database
 
 
-@patch("app.db.database.SessionLocal")
+@patch("app.core.database.SessionLocal")
 def test_get_db_yields_session(mock_session_local):
     mock_session = MagicMock()
     mock_session_local.return_value = mock_session
@@ -13,7 +13,7 @@ def test_get_db_yields_session(mock_session_local):
     assert db == mock_session
 
 
-@patch("app.db.database.SessionLocal")
+@patch("app.core.database.SessionLocal")
 def test_get_db_closes_session(mock_session_local):
     mock_session = MagicMock()
     mock_session_local.return_value = mock_session
