@@ -1,3 +1,4 @@
+from fastapi import HTTPException
 from sqlalchemy.orm import Session
 
 from app.core.models import Recipe, Tag
@@ -28,3 +29,13 @@ def assign_recipe(recipe: RecipeCreate, db_recipe: Recipe) -> None:
         db_recipe.description = recipe.description
     if recipe.notes:
         db_recipe.notes = recipe.notes
+
+
+# TODO: Docstring
+def get_recipe_by_id_handler(recipe_id: int, session: Session) -> Recipe | None:
+    recipe = session.query(Recipe).filter(Recipe.id == recipe_id).first()
+    if not recipe:
+        raise HTTPException(
+            status_code=404, detail=f"Recipe not found for id: {recipe_id}"
+        )
+    return recipe

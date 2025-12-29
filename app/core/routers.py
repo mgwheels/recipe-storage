@@ -5,7 +5,7 @@ from typing import List
 from app.core.database import get_db
 from app.core.models import Recipe, Tag
 from app.core.schemas import RecipeCreate, RecipeResponse
-from app.core.services import process_tags, assign_recipe
+from app.core.services import process_tags, assign_recipe, get_recipe_by_id_handler
 
 router = APIRouter(prefix="/recipes", tags=["recipes"])
 
@@ -51,10 +51,7 @@ def create_recipe(recipe: RecipeCreate, session: Session = Depends(get_db)):
 # TODO: add description
 @router.get("/{recipe_id}", response_model=RecipeResponse)
 def get_recipe_by_id(recipe_id: int, session: Session = Depends(get_db)):
-    recipe = session.query(Recipe).filter(Recipe.id == recipe_id).first()
-    if not recipe:
-        raise HTTPException(status_code=404, detail="Recipe not found!")
-
+    recipe = get_recipe_by_id_handler(recipe_id, session)
     return RecipeResponse.model_validate_response(recipe)
 
 
@@ -64,9 +61,7 @@ def get_recipe_by_id(recipe_id: int, session: Session = Depends(get_db)):
 def update_recipe(
     recipe_id: int, recipe: RecipeCreate, session: Session = Depends(get_db)
 ):
-    db_recipe = session.query(Recipe).filter(Recipe.id == recipe_id).first()
-    if not db_recipe:
-        raise HTTPException(status_code=404, detail="Recipe does not exist!")
+    db_recipe = get_recipe_by_id_handler(recipe_id, session)
 
     # Update recipe fields
     assign_recipe(recipe, db_recipe)
