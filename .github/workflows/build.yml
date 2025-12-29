@@ -1,17 +1,16 @@
 name: Recipe Storage build workflow
 
+
 on:
   push:
     branches: [main]
   pull_request:
     branches: [main]
 
-env:
-  LINUX_RUNNER: ubuntu-latest
 
 jobs:
   commit-lint:
-    runs-on: ${{ github.env.LINUX_RUNNER }}
+    runs-on: ubuntu-latest
     steps:
       - name: Check out code
         uses: actions/checkout@v4
@@ -21,7 +20,7 @@ jobs:
         uses: wagoid/commitlint-github-action@v6
 
   code-lint:
-    runs-on: ${{ github.env.LINUX_RUNNER }}
+    runs-on: ubuntu-latest
     steps:
       - name: Check out code
         uses: actions/checkout@v4
@@ -35,7 +34,7 @@ jobs:
         run: make lint
 
   unit-tests:
-    runs-on: ${{ github.env.LINUX_RUNNER }}
+    runs-on: ubuntu-latest
     steps:
       - name: Check out code
         uses: actions/checkout@v4
@@ -50,7 +49,7 @@ jobs:
         run: make test
 
   code-scan:
-    runs-on: ${{ github.env.LINUX_RUNNER }}
+    runs-on: ubuntu-latest
     permissions:
       security-events: write # Required to upload results to the Security tab
     steps:
