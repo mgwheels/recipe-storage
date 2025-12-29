@@ -1,4 +1,4 @@
-name: CI with Security Scan
+name: Recipe Storage build workflow
 
 on:
   push:

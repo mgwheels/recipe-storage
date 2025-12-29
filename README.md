@@ -14,8 +14,6 @@ recipe-storage
 ├── LICENSE
 ├── makefile
 ├── README.md
-├── requirements.txt
-├── dev-requirements.txt
 ├── app
 │   ├── __init__.py
 │   ├── main.py
@@ -32,11 +30,14 @@ recipe-storage
 │   ├── core
 │   │   ├── test_config.py
 │   │   ├── test_database.py
+├── requirements
+│   ├── base.txt
+│   ├── dev.txt
 ```
 
 ### Running DB
 
-In root directory, run `make deps` and `make run`. If don't have make installed, run `pip install -r requirements.txt` and  `uvicorn app.main:app --reload`.
+In root directory, run `make deps` and `make run`.
 
 Naviage to URL `127.0.0.1:8000/docs` to test available endpoints
 
