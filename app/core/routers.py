@@ -5,7 +5,7 @@ from typing import List
 from app.core.database import get_db
 from app.core.models import Recipe, Tag
 from app.core.schemas import RecipeCreate, RecipeResponse
-from app.core.utils import process_tags
+from app.core.services import process_tags, assign_recipe
 
 router = APIRouter(prefix="/recipes", tags=["recipes"])
 
@@ -35,10 +35,7 @@ def create_recipe(recipe: RecipeCreate, session: Session = Depends(get_db)):
 
     # Create new recipe
     new_recipe = Recipe(name=recipe.name)
-    if recipe.description:
-        new_recipe.description = recipe.description
-    if recipe.notes:
-        new_recipe.notes = recipe.notes
+    assign_recipe(recipe, new_recipe)
     session.add(new_recipe)
 
     # Process tags
@@ -72,14 +69,10 @@ def update_recipe(
         raise HTTPException(status_code=404, detail="Recipe does not exist!")
 
     # Update recipe fields
-    if recipe.name:
-        db_recipe.name = recipe.name
-    if recipe.description:
-        db_recipe.description = recipe.description
-    if recipe.notes:
-        db_recipe.notes = recipe.notes
+    assign_recipe(recipe, db_recipe)
 
     # Update tags
+    # TODO: Move clearing tags to process_tags, don't clear tags if they are not getting updated
     db_recipe.tags.clear()  # Remove existing tags
     process_tags(recipe, db_recipe, session)
 

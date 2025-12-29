@@ -5,7 +5,7 @@ from app.core.schemas import RecipeCreate
 
 
 # TODO: Docstring
-def process_tags(recipe: RecipeCreate, db_recipe: Recipe, session: Session):
+def process_tags(recipe: RecipeCreate, db_recipe: Recipe, session: Session) -> None:
     # Process tags
     for tag_name in recipe.tags:
         tag_name = tag_name.lower()
@@ -18,3 +18,13 @@ def process_tags(recipe: RecipeCreate, db_recipe: Recipe, session: Session):
             session.refresh(tag)
         # Associate the tag with the recipe
         db_recipe.tags.append(tag)
+
+
+# TODO: Docstring
+def assign_recipe(recipe: RecipeCreate, db_recipe: Recipe) -> None:
+    if recipe.name:
+        db_recipe.name = recipe.name
+    if recipe.description:
+        db_recipe.description = recipe.description
+    if recipe.notes:
+        db_recipe.notes = recipe.notes

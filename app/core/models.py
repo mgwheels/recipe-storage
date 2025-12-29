@@ -24,13 +24,14 @@ class Tag(Base):
     )
 
 
+# TODO: Review default. Should this be an Optional None value instead of empty string?
 class Recipe(Base):
     __tablename__ = "recipes"
 
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String(100), nullable=False, unique=True)
-    description = Column(String(100), nullable=False)
-    notes = Column(String(500), nullable=True)
+    description = Column(String(100), nullable=True, default="")
+    notes = Column(String(500), nullable=True, default="")
 
     # Many-to-many relationships
     tags: Mapped[list["Tag"]] = relationship(
