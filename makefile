@@ -3,7 +3,7 @@ help:
 
 deps:
 	python -m pip install --upgrade pip
-	pip install -r requirements/base.txt -r requirements/dev.txt
+	pip install -r requirements.txt -r dev-requirements.txt
 
 lint:
 	ruff check --fix . && ruff format .

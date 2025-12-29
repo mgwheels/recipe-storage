@@ -6,54 +6,59 @@ on:
   pull_request:
     branches: [main]
 
-jobs:
-  linting:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Check out code # TODO: Split out shared checkout, setup, deps
-        uses: actions/checkout@v4
+env:
+  LINUX_RUNNER: ubuntu-latest
 
+jobs:
+  commit-lint:
+    runs-on: ${{ github.env.LINUX_RUNNER }}
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Required to fetch all history for linting
+      - name: Run commit lint
+        uses: wagoid/commitlint-github-action@v6
+
+  code-lint:
+    runs-on: ${{ github.env.LINUX_RUNNER }}
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-
       - name: Install dependencies
         run: make deps
-
-      - name: Run Lint
+      - name: Run code lint
         run: make lint
 
   unit-tests:
-    runs-on: ubuntu-latest
+    runs-on: ${{ github.env.LINUX_RUNNER }}
     steps:
       - name: Check out code
         uses: actions/checkout@v4
-
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.12'
           cache: 'pip'
-
       - name: Install dependencies
         run: make deps
-
-      - name: Run Tests
+      - name: Run unit tests
         run: make test
 
   code-scan:
-    runs-on: ubuntu-latest
+    runs-on: ${{ github.env.LINUX_RUNNER }}
     permissions:
       security-events: write # Required to upload results to the Security tab
     steps:
       - name: Check out code
         uses: actions/checkout@v4
-
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v3
         with:
           languages: python
-
-      - name: Perform Analysis
+      - name: Perform CodeQL analysis
         uses: github/codeql-action/analyze@v3

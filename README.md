@@ -14,6 +14,8 @@ recipe-storage
 ├── LICENSE
 ├── makefile
 ├── README.md
+├── requirements.txt
+├── dev-requirements.txt
 ├── app
 │   ├── __init__.py
 │   ├── main.py
@@ -30,9 +32,6 @@ recipe-storage
 │   ├── core
 │   │   ├── test_config.py
 │   │   ├── test_database.py
-├── requirements
-│   ├── base.txt
-│   ├── dev.txt
 ```
 
 ### Running DB
