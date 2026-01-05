@@ -1,5 +1,5 @@
 help:
-	echo "\nAvailable make commands:\n\ndeps\nlint\nrun\ntest"
+	echo "\nAvailable make commands:\n\ndeps\nlint\nrun\ntest\ndocker-run\ndocker-stop"
 
 deps:
 	python -m pip install --upgrade pip
@@ -13,3 +13,12 @@ run:
 
 test:
 	python -m pytest
+
+# TODO: remove sudo after updating docker permissions
+docker-run:
+	sudo docker build -t recipe-storage .
+	sudo docker run -d --rm --name recipe-storage recipe-storage
+
+# TODO: remove sudo after updating docker permissions
+docker-stop:
+	sudo docker stop recipe-storage
