@@ -49,9 +49,9 @@ def create_recipe(recipe: RecipeCreate, session: Session = Depends(get_db)):
 
 # Read recipe by ID
 @router.get(
-        "/{recipe_id}",
-        description="Get recipe by ID from database",
-        response_model=RecipeResponse
+    "/{recipe_id}",
+    description="Get recipe by ID from database",
+    response_model=RecipeResponse,
 )
 def get_recipe_by_id(recipe_id: int, session: Session = Depends(get_db)):
     recipe = get_recipe_by_id_handler(recipe_id, session)
@@ -60,9 +60,9 @@ def get_recipe_by_id(recipe_id: int, session: Session = Depends(get_db)):
 
 # Update recipe by ID
 @router.put(
-        "/{recipe_id}",
-        description="Update recipe in database by ID",
-        response_model=RecipeResponse
+    "/{recipe_id}",
+    description="Update recipe in database by ID",
+    response_model=RecipeResponse,
 )
 def update_recipe(
     recipe_id: int, recipe: RecipeCreate, session: Session = Depends(get_db)
@@ -85,8 +85,8 @@ def update_recipe(
 
 # Delete recipe by ID
 @router.delete(
-        "/{recipe_id}",
-        description="Delete recipe by ID from database",
+    "/{recipe_id}",
+    description="Delete recipe by ID from database",
 )
 def delete_recipe(recipe_id: int, session: Session = Depends(get_db)):
     db_recipe = session.query(Recipe).filter(Recipe.id == recipe_id).first()
