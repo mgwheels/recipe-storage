@@ -48,16 +48,22 @@ def create_recipe(recipe: RecipeCreate, session: Session = Depends(get_db)):
 
 
 # Read recipe by ID
-# TODO: add description
-@router.get("/{recipe_id}", response_model=RecipeResponse)
+@router.get(
+        "/{recipe_id}",
+        description="Get recipe by ID from database",
+        response_model=RecipeResponse
+)
 def get_recipe_by_id(recipe_id: int, session: Session = Depends(get_db)):
     recipe = get_recipe_by_id_handler(recipe_id, session)
     return RecipeResponse.model_validate_response(recipe)
 
 
 # Update recipe by ID
-# TODO: add description
-@router.put("/{recipe_id}", response_model=RecipeResponse)
+@router.put(
+        "/{recipe_id}",
+        description="Update recipe in database by ID",
+        response_model=RecipeResponse
+)
 def update_recipe(
     recipe_id: int, recipe: RecipeCreate, session: Session = Depends(get_db)
 ):
@@ -78,8 +84,10 @@ def update_recipe(
 
 
 # Delete recipe by ID
-# TODO: add description
-@router.delete("/{recipe_id}")
+@router.delete(
+        "/{recipe_id}",
+        description="Delete recipe by ID from database",
+)
 def delete_recipe(recipe_id: int, session: Session = Depends(get_db)):
     db_recipe = session.query(Recipe).filter(Recipe.id == recipe_id).first()
     if not db_recipe:
@@ -93,7 +101,7 @@ def delete_recipe(recipe_id: int, session: Session = Depends(get_db)):
 # Read recipes by tag
 @router.get(
     "/tags/{tag_name}",
-    description="Search recipes by tag",
+    description="Search recipes in database by tag",
     response_model=List[RecipeResponse],
 )
 def search_recipes_by_tag(tag_name: str, session: Session = Depends(get_db)):
