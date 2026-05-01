@@ -1,11 +1,15 @@
 from fastapi import APIRouter, HTTPException, Depends
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import joinedload, Session
 from typing import List
 
 from app.core.database import get_db
-from app.core.models import Recipe, Tag
+from app.core.models import Recipe
 from app.core.schemas import RecipeCreate, RecipeResponse
-from app.core.services import process_tags, assign_recipe, get_recipe_by_id_handler
+from app.core.services import (
+    process_tags,
+    process_ingredients,
+    get_recipe_by_id_handler,
+)
 
 router = APIRouter(prefix="/recipes", tags=["recipes"])
 
@@ -17,10 +21,12 @@ router = APIRouter(prefix="/recipes", tags=["recipes"])
     response_model=List[RecipeResponse],
 )
 def get_recipes(session: Session = Depends(get_db)):
-    # Query all recipes
-    recipes = session.query(Recipe).all()
-
+    recipes = session.query(Recipe).options(
+        joinedload(Recipe.tags),
+        joinedload(Recipe.ingredients)
+    ).all()
     return [RecipeResponse.model_validate_response(recipe) for recipe in recipes]
+
 
 
 # Create recipe
@@ -35,11 +41,15 @@ def create_recipe(recipe: RecipeCreate, session: Session = Depends(get_db)):
 
     # Create new recipe
     new_recipe = Recipe(name=recipe.name)
-    assign_recipe(recipe, new_recipe)
+    new_recipe.description = recipe.description
+    new_recipe.notes = recipe.notes
     session.add(new_recipe)
 
     # Process tags
-    process_tags(recipe, new_recipe, session)
+    process_tags(recipe, new_recipe)
+
+    # Process ingredients
+    process_ingredients(recipe, new_recipe)
 
     session.commit()
     session.refresh(new_recipe)
@@ -69,13 +79,16 @@ def update_recipe(
 ):
     db_recipe = get_recipe_by_id_handler(recipe_id, session)
 
-    # Update recipe fields
-    assign_recipe(recipe, db_recipe)
+    # Update recipe fields directly
+    db_recipe.name = recipe.name
+    db_recipe.description = recipe.description
+    db_recipe.notes = recipe.notes
 
     # Update tags
-    # TODO: Move clearing tags to process_tags, don't clear tags if they are not getting updated
-    db_recipe.tags.clear()  # Remove existing tags
-    process_tags(recipe, db_recipe, session)
+    process_tags(recipe, db_recipe)
+
+    # Update ingredients
+    process_ingredients(recipe, db_recipe)
 
     session.commit()
     session.refresh(db_recipe)
@@ -97,15 +110,3 @@ def delete_recipe(recipe_id: int, session: Session = Depends(get_db)):
     session.commit()
     return {"message": "Recipe deleted!"}
 
-
-# Read recipes by tag
-@router.get(
-    "/tags/{tag_name}",
-    description="Search recipes in database by tag",
-    response_model=List[RecipeResponse],
-)
-def search_recipes_by_tag(tag_name: str, session: Session = Depends(get_db)):
-    # Query recipes that have the given tag
-    recipes = session.query(Recipe).join(Recipe.tags).filter(Tag.name == tag_name).all()
-
-    return [RecipeResponse.model_validate_response(recipe) for recipe in recipes]

@@ -8,28 +8,30 @@ from app.core.models import Recipe
 class RecipeCreate(BaseModel):
     name: str = ""
     description: str = ""
+    ingredients: list[dict[str, str]] = [{"name": "", "quantity": ""}]
     notes: str = ""
-    tags: list[str] = []
+    tags: list[str] = [""]
 
 
 class RecipeResponse(BaseModel):
     id: int
     name: str
     description: str = ""
+    ingredients: list[dict[str, str]] = []
     notes: str = ""
-    tags: list[str] = ""
+    tags: list[str] = []
 
     model_config = ConfigDict(from_attributes=True)
 
     @classmethod
     def model_validate_response(cls, recipe: Recipe):
-        # Transform tags into strings and return the response
         try:
             return cls(
                 id=recipe.id,
                 name=recipe.name,
-                description=recipe.description,
-                notes=recipe.notes,
+                description=recipe.description or "",
+                ingredients=[{"name": ing.name, "quantity": ing.quantity or ""} for ing in recipe.ingredients],
+                notes=recipe.notes or "",
                 tags=[tag.name for tag in recipe.tags],
             )
         except Exception as e:
