@@ -1,11 +1,11 @@
-FROM python:3.12
+FROM python:3.14-slim
 
 # Set working directory
 WORKDIR /app
 
 # Copy and install dependencies
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+COPY pyproject.toml uv.lock
+RUN uv sync --frozen
 
 # Copy application code
 COPY ./app /app/app

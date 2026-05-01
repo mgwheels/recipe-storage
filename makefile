@@ -2,22 +2,21 @@ help:
 	echo "\nAvailable make commands:\n\ndeps\nlint\nrun\ntest\ndocker-run\ndocker-stop"
 
 deps:
-	python -m pip install --upgrade pip
-	pip install -r requirements.txt -r dev-requirements.txt
+	uv sync
 
 lint:
-	ruff check --fix . && ruff format .
+	uv run ruff check --fix . && uv run ruff format .
 
 run:
-	uvicorn app.main:app --reload
+	uv run uvicorn app.main:app --reload
 
 test:
-	python -m pytest
+	uv run python -m pytest
 
 # TODO: remove sudo after updating docker permissions
 docker-run:
 	sudo docker build -t recipe-storage .
-	sudo docker run -d --rm --name recipe-storage recipe-storage
+	sudo docker run -d --rm --name recipe-storage -p 8000:8000 recipe-storage
 
 # TODO: remove sudo after updating docker permissions
 docker-stop:

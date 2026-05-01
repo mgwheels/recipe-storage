@@ -9,29 +9,34 @@ Python app designed to locally manage various recipes. Built with FastAPI and SQ
 The project structure is as follows:
 
 ```
-recipe-storage
+recipe-storage/
+├── .github/
+│   └── workflows/
+│       └── build.yml
 ├── .gitignore
+├── .python-version
+├── Dockerfile
 ├── LICENSE
 ├── makefile
+├── pyproject.toml
 ├── README.md
-├── requirements.txt
-├── dev-requirements.txt
-├── app
+├── uv.lock
+├── app/
 │   ├── __init__.py
 │   ├── main.py
-│   ├── core
-│   │   ├── __init__.py
-│   │   ├── config.py
-│   │   ├── database.py
-│   │   ├── models.py
-│   │   ├── routers.py
-│   │   ├── schemas.py
-│   │   ├── utils.py
-├── tests
-│   ├── test-main.py
-│   ├── core
-│   │   ├── test_config.py
-│   │   ├── test_database.py
+│   └── core/
+│       ├── __init__.py
+│       ├── config.py
+│       ├── database.py
+│       ├── models.py
+│       ├── routers.py
+│       ├── schemas.py
+│       └── services.py
+├── tests/
+│   ├── test_main.py
+│   └── core/
+│       ├── test_config.py
+│       └── test_database.py
 ```
 
 ### Running DB
