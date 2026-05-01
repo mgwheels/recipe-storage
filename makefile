@@ -1,5 +1,5 @@
 help:
-	echo "\nAvailable make commands:\n\ndeps\nlint\nrun\ntest\ndocker-run\ndocker-stop"
+	echo "\nAvailable make commands:\n\ndeps\nlint\nrun\ntest\ndocker-run\ndocker-stop\ndocker-logs"
 
 deps:
 	uv sync
@@ -21,3 +21,6 @@ docker-run:
 # TODO: remove sudo after updating docker permissions
 docker-stop:
 	sudo docker stop recipe-storage
+
+docker-logs:
+	docker logs -f recipe-storage
