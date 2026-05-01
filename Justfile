@@ -1,5 +1,5 @@
 help:
-    echo "\nAvailable just commands:\n\ndeps\nlint\nrun\ntest\ndocker-run\ndocker-stop\ndocker-logs"
+    echo "\nAvailable just commands:\n\ndeps\nlint\nrun\ntest\ndocker-run\ndocker-stop\ndocker-logs\nvi"
 
 deps:
     uv sync
@@ -24,3 +24,6 @@ docker-stop:
 
 docker-logs:
     docker logs -f recipe-storage
+
+vi:
+  uv run nvim .
