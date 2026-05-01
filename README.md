@@ -17,7 +17,7 @@ recipe-storage/
 ├── .python-version
 ├── Dockerfile
 ├── LICENSE
-├── makefile
+├── Justfile
 ├── pyproject.toml
 ├── README.md
 ├── uv.lock
@@ -41,7 +41,7 @@ recipe-storage/
 
 ### Running DB
 
-In root directory, run `make deps` and `make run`.
+In root directory, run `just deps` and `just run`.
 
 Naviage to URL `127.0.0.1:8000/docs` to test available endpoints
 

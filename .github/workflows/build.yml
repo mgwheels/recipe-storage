@@ -29,9 +29,9 @@ jobs:
         with:
           python-version: '3.14'
       - name: Install dependencies
-        run: make deps
+        run: just deps
       - name: Run code lint
-        run: make lint
+        run: just lint
 
   unit-tests:
     runs-on: ubuntu-latest
@@ -43,9 +43,9 @@ jobs:
         with:
           python-version: '3.14'
       - name: Install dependencies
-        run: make deps
+        run: just deps
       - name: Run unit tests
-        run: make test
+        run: just test
 
   code-scan:
     runs-on: ubuntu-latest
