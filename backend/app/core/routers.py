@@ -21,12 +21,12 @@ router = APIRouter(prefix="/recipes", tags=["recipes"])
     response_model=List[RecipeResponse],
 )
 def get_recipes(session: Session = Depends(get_db)):
-    recipes = session.query(Recipe).options(
-        joinedload(Recipe.tags),
-        joinedload(Recipe.ingredients)
-    ).all()
+    recipes = (
+        session.query(Recipe)
+        .options(joinedload(Recipe.tags), joinedload(Recipe.ingredients))
+        .all()
+    )
     return [RecipeResponse.model_validate_response(recipe) for recipe in recipes]
-
 
 
 # Create recipe
@@ -109,4 +109,3 @@ def delete_recipe(recipe_id: int, session: Session = Depends(get_db)):
     session.delete(db_recipe)
     session.commit()
     return {"message": "Recipe deleted!"}
-

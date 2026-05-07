@@ -22,8 +22,7 @@ def process_tags(recipe: RecipeCreate, db_recipe: Recipe) -> None:
 
 
 # TODO: Docstring
-def process_ingredients(
-    recipe: RecipeCreate, db_recipe: Recipe) -> None:
+def process_ingredients(recipe: RecipeCreate, db_recipe: Recipe) -> None:
     # Clear existing ingredients
     db_recipe.ingredients.clear()
 
@@ -33,20 +32,22 @@ def process_ingredients(
         if not ingredient_name:
             continue
         ingredient_quantity = ingredient_data.get("quantity", "").strip()
-        
+
         # Create and append ingredient
-        ingredient = Ingredient(
-            name=ingredient_name, quantity=ingredient_quantity
-        )
+        ingredient = Ingredient(name=ingredient_name, quantity=ingredient_quantity)
         db_recipe.ingredients.append(ingredient)
 
 
 # TODO: Docstring
 def get_recipe_by_id_handler(recipe_id: int, session: Session) -> Recipe:
-    recipe = session.query(Recipe).options(
-        joinedload(Recipe.tags),
-        joinedload(Recipe.ingredients)
-    ).filter(Recipe.id == recipe_id).first()
+    recipe = (
+        session.query(Recipe)
+        .options(joinedload(Recipe.tags), joinedload(Recipe.ingredients))
+        .filter(Recipe.id == recipe_id)
+        .first()
+    )
     if not recipe:
-        raise HTTPException(status_code=404, detail=f"Recipe not found for id: {recipe_id}")
+        raise HTTPException(
+            status_code=404, detail=f"Recipe not found for id: {recipe_id}"
+        )
     return recipe

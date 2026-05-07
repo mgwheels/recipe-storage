@@ -30,7 +30,10 @@ class RecipeResponse(BaseModel):
                 id=recipe.id,
                 name=recipe.name,
                 description=recipe.description or "",
-                ingredients=[{"name": ing.name, "quantity": ing.quantity or ""} for ing in recipe.ingredients],
+                ingredients=[
+                    {"name": ing.name, "quantity": ing.quantity or ""}
+                    for ing in recipe.ingredients
+                ],
                 notes=recipe.notes or "",
                 tags=[tag.name for tag in recipe.tags],
             )
